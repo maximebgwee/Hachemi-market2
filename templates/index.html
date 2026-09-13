@@ -1,0 +1,71 @@
+{% extends "base.html" %}
+{% block title %}Hachemi Market — Boutique{% endblock %}
+{% block content %}
+<section class="hero reveal">
+    <div>
+        <span class="eyebrow">Depuis 2014</span>
+        <h1>Bienvenue au<br><em>Hachemi Market.</em></h1>
+        <p>Une sélection soigneusement choisie, directement depuis notre petit marché.</p>
+        <p class="signature">Hachemi, fondateur</p>
+    </div>
+</section>
+{% if sunday %}
+<div class="sunday-banner reveal">
+    <strong>Dimanche spécial</strong>
+    <span>-10% sur tous les produits aujourd'hui</span>
+</div>
+{% endif %}
+<section class="story reveal">
+    <span class="eyebrow">Notre histoire</span>
+    <h2>Un marché créé avec passion.</h2>
+    <p>Fondé en 2014, Hachemi Market a commencé avec une idée simple : proposer une sélection de produits dans une boutique agréable et accessible.</p>
+</section>
+<section class="catalogue">
+    <div class="section-heading reveal">
+        <div>
+            <span class="eyebrow">Catalogue</span>
+            <h2>Nos produits</h2>
+        </div>
+        <span>{{ products|length }} produit(s)</span>
+    </div>
+    {% if products %}
+    <div class="products-grid">
+        {% for product in products %}
+        <article class="product-card reveal">
+            <a href="{{ url_for('product', product_id=product.id) }}">
+                {% if product.image %}
+                    <img src="{{ url_for('static', filename='uploads/' + product.image) }}" alt="{{ product.name }}">
+                {% else %}
+                    <div class="no-image">Aucune image</div>
+                {% endif %}
+            </a>
+            <div class="product-info">
+                <a class="product-name" href="{{ url_for('product', product_id=product.id) }}">{{ product.name }}</a>
+                <p class="description">{{ product.description or "Aucune description." }}</p>
+                <div class="price-row">
+                    {% if sunday %}
+                        <div>
+                            <span class="old-price">{{ product.price|price }}</span>
+                            <strong>{{ final_price(product.price)|price }}</strong>
+                        </div>
+                        <span class="promo">-10%</span>
+                    {% else %}
+                        <strong>{{ product.price|price }}</strong>
+                    {% endif %}
+                </div>
+                {% if product.stock > 0 %}
+                    <span class="stock">● {{ product.stock }} disponible(s)</span>
+                    <button class="buy-btn" onclick="buyProduct({{ product.id }}, this)">Acheter</button>
+                {% else %}
+                    <span class="out-stock">● Rupture de stock</span>
+                    <button class="buy-btn disabled" disabled>Indisponible</button>
+                {% endif %}
+            </div>
+        </article>
+        {% endfor %}
+    </div>
+    {% else %}
+        <div class="empty reveal">Aucun produit disponible pour le moment.</div>
+    {% endif %}
+</section>
+{% endblock %}

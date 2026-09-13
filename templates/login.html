@@ -1,0 +1,15 @@
+{% extends "base.html" %}
+{% block title %}Administration — Hachemi Market{% endblock %}
+{% block content %}
+<section class="login-page reveal">
+    <span class="eyebrow">Administration</span>
+    <h1>Connexion</h1>
+    <form method="POST" class="admin-form">
+        <label>Identifiant</label>
+        <input name="username" required autocomplete="username">
+        <label>Mot de passe</label>
+        <input name="password" type="password" required autocomplete="current-password">
+        <button class="buy-btn" type="submit">Se connecter</button>
+    </form>
+</section>
+{% endblock %}
