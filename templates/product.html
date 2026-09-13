@@ -1,76 +1,125 @@
 {% extends "base.html" %}
+
 {% block title %}{{ product.name }} — Hachemi Market{% endblock %}
+
 {% block content %}
+
 <section class="product-page reveal">
-    <a href="{{ url_for('index') }}" class="back">← Retour à la boutique</a>
-    <div class="product-detail">
-        <div class="detail-image">
+
+    <a href="{{ url_for('index') }}" class="back">← Retour au marché</a>
+
+    <div class="product-layout">
+
+        <div class="product-image">
+
             {% if product.image %}
                 <img src="{{ url_for('static', filename='uploads/' + product.image) }}" alt="{{ product.name }}">
             {% else %}
-                <div class="no-image">Aucune image</div>
+                <div class="no-image">Hachemi Market</div>
             {% endif %}
+
         </div>
-        <div class="detail-content">
+
+        <div class="product-info">
+
             <span class="eyebrow">Produit</span>
+
             <h1>{{ product.name }}</h1>
-            <p class="detail-description">{{ product.description or "Aucune description." }}</p>
-            <div class="detail-price">
+
+            <p class="description">{{ product.description }}</p>
+
+            <div class="price large">
+
                 {% if sunday %}
-                    <span class="old-price">{{ product.price|price }}</span>
-                    <strong>{{ final_price(product.price)|price }}</strong>
-                    <span class="promo">-10%</span>
+                    <span class="old-price">{{ "%.2f"|format(product.price) }} €</span>
+                    <span>{{ "%.2f"|format(final_price(product.price)) }} €</span>
+                    <b>-10%</b>
                 {% else %}
-                    <strong>{{ product.price|price }}</strong>
+                    <span>{{ "%.2f"|format(product.price) }} €</span>
                 {% endif %}
+
             </div>
+
+            <p class="stock">
+                {% if product.stock > 0 %}
+                    {{ product.stock }} en stock
+                {% else %}
+                    Rupture de stock
+                {% endif %}
+            </p>
+
             {% if product.stock > 0 %}
-                <p class="stock">● {{ product.stock }} disponible(s)</p>
-                <button class="buy-btn" onclick="buyProduct({{ product.id }}, this)">Acheter</button>
+
+            <form action="{{ url_for('buy', product_id=product.id) }}" method="POST">
+                <button class="button" type="submit">Acheter</button>
+            </form>
+
             {% else %}
-                <p class="out-stock">● Rupture de stock</p>
-                <button class="buy-btn disabled" disabled>Indisponible</button>
+
+            <button class="button disabled" disabled>
+                Indisponible
+            </button>
+
             {% endif %}
+
         </div>
+
     </div>
+
 </section>
+
 <section class="reviews reveal">
+
     <div class="section-heading">
         <div>
-            <span class="eyebrow">Avis</span>
-            <h2>Ce qu'en pensent nos clients</h2>
+            <span class="eyebrow">Avis clients</span>
+            <h2>Les avis</h2>
         </div>
-        {% if stats.average %}
-            <strong class="average">★ {{ "%.1f"|format(stats.average) }}/5</strong>
-        {% endif %}
+
+        <div class="rating">
+            ★ {{ average }}/5
+        </div>
     </div>
-    {% if reviews %}
-        <div class="review-list">
-            {% for review in reviews %}
-            <div class="review">
-                <div class="stars">
-                    {% for i in range(review.rating) %}★{% endfor %}
-                    {% for i in range(5 - review.rating) %}☆{% endfor %}
-                </div>
-                <p>{{ review.comment }}</p>
-            </div>
-            {% endfor %}
-        </div>
-    {% else %}
-        <p>Aucun avis pour le moment.</p>
-    {% endif %}
-    <form class="review-form" method="POST" action="{{ url_for('add_review', product_id=product.id) }}">
-        <h3>Laisser un avis</h3>
-        <label>Note</label>
+
+    <form class="review-form" action="{{ url_for('add_review', product_id=product.id) }}" method="POST">
+
         <select name="rating" required>
-            <option value="5">★★★★★ — 5/5</option>
-            <option value="4">★★★★☆ — 4/5</option>
-            <option value="3">★★★☆☆ — 3/5</option>
-            <option value="2">★★☆☆☆ — 2/5</option>
-            <option value="1">★☆☆☆☆ — 1/5</option>
+            <option value="">Note</option>
+            <option value="5">★★★★★ — 5</option>
+            <option value="4">★★★★☆ — 4</option>
+            <option value="3">★★★☆☆ — 3</option>
+            <option value="2">★★☆☆☆ — 2</option>
+            <option value="1">★☆☆☆☆ — 1</option>
         </select>
+
         <textarea name="comment" placeholder="Votre commentaire..." required></textarea>
-        <button class="buy-btn" type="submit">Publier</button>
+
+        <button class="button" type="submit">Publier mon avis</button>
+
     </form>
+
+    <div class="review-list">
+
+        {% for review in reviews %}
+
+        <article class="review">
+            <div class="stars">
+                {{ "★" * review.rating }}{{ "☆" * (5 - review.rating) }}
+            </div>
+
+            <p>{{ review.comment }}</p>
+
+            <small>{{ review.created_at }}</small>
+        </article>
+
+        {% else %}
+
+        <p>Aucun avis pour le moment.</p>
+
+        {% endfor %}
+
+    </div>
+
 </section>
+
 {% endblock %}
